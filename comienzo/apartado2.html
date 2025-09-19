@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardianes de la Ciudad </title>
+  <link rel="icon" href="../imagenes/auto.jpg" type="image/x-icon">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to top, #4facfe, #00f2fe);
+      font-family: Arial, sans-serif;
+      cursor: pointer;
+      position: relative;
+    }
+
+    h1 {
+      position: absolute;
+      top: 20px;
+      color: #fff;
+      font-size: 28px;
+      text-shadow: 0 0 10px black;
+      z-index: 10;
+      animation: parpadeo 2s infinite alternate;
+    }
+
+    .sol {
+      position: absolute;
+      top: 50px;
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      border-radius: 50%;
+      box-shadow: 0 0 30px yellow;
+      animation: girar 20s linear infinite;
+    }
+
+    @keyframes girar {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes parpadeo {
+      from { opacity: 1; }
+      to { opacity: 0.7; }
+    }
+
+    .arbol {
+      position: absolute;
+      bottom: 0;
+      width: 40px;
+      height: 100px;
+      background: #4caf50;
+      border-radius: 0 0 20px 20px;
+      animation: crecer 3s ease-in-out forwards;
+    }
+
+    .arbol::before {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: -30px;
+      width: 100px;
+      height: 100px;
+      background: #2e7d32;
+      border-radius: 50%;
+    }
+
+    @keyframes crecer {
+      0% { height: 0; }
+      100% { height: 100px; }
+    }
+
+    .hoja {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: green;
+      border-radius: 50%;
+      animation: caer 6s linear infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes caer {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🌱 Guardianes de la Ciudad </h1>
+  <div class="sol"></div>
+
+  <!-- Música de fondo -->
+  <audio id="musicaFondo" loop>
+    <source src="../musica/free-fire.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Sonido Plo -->
+  <audio id="sonidoPlo">
+    <source src="../musica/httpswwwyoutubecomwatchvfbkg2mz8uc.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const musica = document.getElementById("musicaFondo");
+    const sonidoPlo = document.getElementById("sonidoPlo");
+    let clicks = 0;
+
+    // Crear árboles
+    for (let i = 0; i < 5; i++) {
+      const arbol = document.createElement("div");
+      arbol.classList.add("arbol");
+      arbol.style.left = `${i * 20 + 10}%`;
+      document.body.appendChild(arbol);
+    }
+
+    // Crear hojas volando
+    function crearHoja() {
+      const hoja = document.createElement("div");
+      hoja.classList.add("hoja");
+      hoja.style.left = `${Math.random() * 100}%`;
+      hoja.style.background = `hsl(${Math.random() * 120}, 70%, 40%)`;
+      hoja.style.animationDuration = `${Math.random() * 3 + 3}s`;
+      document.body.appendChild(hoja);
+      setTimeout(() => hoja.remove(), 6000);
+    }
+    setInterval(crearHoja, 800);
+
+    // Clics con distintas funciones
+    document.body.addEventListener("click", () => {
+      clicks++;
+
+      if (clicks === 1) {
+        // Primer clic: empieza la música de fondo
+        musica.play().catch(() => {
+          console.log("El navegador bloqueó la reproducción automática.");
+        });
+      } else if (clicks === 2) {
+        // Segundo clic: suena Plo y redirige
+        sonidoPlo.currentTime = 0;
+        sonidoPlo.play();
+        setTimeout(() => {
+          window.location.href = "../looby/loby.html";
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
+

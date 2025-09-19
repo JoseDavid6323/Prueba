@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardianes - Juego</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      background: url("../imagenes/looby.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .info {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    #gameContainer {
+      margin: 60px auto;
+      width: 700px;
+      height: 400px;
+      border: 2px solid black;
+      position: relative;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: none;
+    }
+    .player {
+      position: absolute;
+      width: 40px;
+      height: 80px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      border: 2px solid #333;
+    }
+    .player::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 5px;
+      width: 30px;
+      height: 10px;
+      background: red;
+      border-radius: 3px;
+    }
+    .player::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 5px;
+      width: 30px;
+      height: 30px;
+      background: #f1c27d;
+      border-radius: 50%;
+    }
+    .trash {
+      width: 20px;
+      height: 20px;
+      background: brown;
+      position: absolute;
+      border-radius: 3px;
+    }
+    .tree {
+      width: 20px;
+      height: 40px;
+      background: green;
+      position: absolute;
+      border-radius: 5px;
+    }
+    .level, .time {
+      position: absolute;
+      top: 5px;
+      padding: 3px 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border-radius: 5px;
+    }
+    .level { left: 50%; transform: translateX(-50%); }
+    .time { right: 10px; }
+
+    /* Joystick y botón para móvil */
+    #joystick, #plantarBtn {
+      display: none;
+      position: absolute;
+      z-index: 10;
+    }
+    #joystick {
+      bottom: 20px;
+      left: 20px;
+      width: 100px;
+      height: 100px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 50%;
+      touch-action: none;
+    }
+    #joystickHandle {
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
+      position: absolute;
+      top: 30px;
+      left: 30px;
+    }
+    #plantarBtn {
+      bottom: 40px;
+      right: 40px;
+      padding: 15px;
+      background: green;
+      color: white;
+      border-radius: 50%;
+      font-size: 18px;
+      border: none;
+    }
+    @media (max-width: 800px) {
+      #joystick, #plantarBtn { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="info">🌳 Árboles: <span id="trees">0</span> | 🗑 Basura: <span id="score">0</span></div>
+    <div>
+      <button>⚙ Configuración</button>
+      <button onclick="salir()">🚪 Salir</button>
+    </div>
+  </header>
+
+  <div id="gameContainer">
+    <div class="level" id="level">Nivel: 1</div>
+    <div class="time" id="time">Tiempo: 30</div>
+    <div id="player" class="player"></div>
+  </div>
+
+  <!-- Joystick y botón plantar -->
+  <div id="joystick"><div id="joystickHandle"></div></div>
+  <button id="plantarBtn">🌳</button>
+
+  <!-- Música -->
+  <audio id="gameMusic" src="../musica/wwd.mp3juice.blog - Vamos a Cuidar La Tierra - Bichikids El Reino Infantil (320 KBps).mp3"></audio>
+
+  <script>
+    const player = document.getElementById("player");
+    const gameContainer = document.getElementById("gameContainer");
+    const scoreEl = document.getElementById("score");
+    const treesEl = document.getElementById("trees");
+    const timeEl = document.getElementById("time");
+    const levelEl = document.getElementById("level");
+    const gameMusic = document.getElementById("gameMusic");
+
+    const joystick = document.getElementById("joystick");
+    const joystickHandle = document.getElementById("joystickHandle");
+    const plantarBtn = document.getElementById("plantarBtn");
+
+    let score = 0, trees = 0;
+    let time = 30, level = 1, speed = 10;
+    let playerX = 50, playerY = 50;
+    let musicPlaying = false;
+    let trashItems = [];
+
+    function limpiarNivel() {
+      document.querySelectorAll(".trash, .tree").forEach(el => el.remove());
+      trashItems = [];
+    }
+
+    function generateTrash(count) {
+      for (let i = 0; i < count; i++) {
+        let trash = document.createElement("div");
+        trash.classList.add("trash");
+        trash.style.left = Math.random() * (gameContainer.clientWidth - 20) + "px";
+        trash.style.top = Math.random() * (gameContainer.clientHeight - 20) + "px";
+        gameContainer.appendChild(trash);
+        trashItems.push(trash);
+      }
+    }
+
+    generateTrash(5);
+
+    function mover(dx, dy) {
+      if (!musicPlaying) {
+        gameMusic.loop = true;
+        gameMusic.play();
+        musicPlaying = true;
+      }
+
+      playerX += dx;
+      playerY += dy;
+
+      playerX = Math.max(0, Math.min(playerX, gameContainer.clientWidth - 40));
+      playerY = Math.max(0, Math.min(playerY, gameContainer.clientHeight - 80));
+
+      player.style.left = playerX + "px";
+      player.style.top = playerY + "px";
+
+      trashItems.forEach((trash, index) => {
+        let trashRect = trash.getBoundingClientRect();
+        let playerRect = player.getBoundingClientRect();
+        if (!(trashRect.right < playerRect.left || trashRect.left > playerRect.right || trashRect.bottom < playerRect.top || trashRect.top > playerRect.bottom)) {
+          trash.remove();
+          trashItems.splice(index, 1);
+          score++;
+          scoreEl.textContent = score;
+        }
+      });
+
+      if (trashItems.length === 0) {
+        nextLevel();
+      }
+    }
+
+    function plantar() {
+      let tree = document.createElement("div");
+      tree.classList.add("tree");
+      tree.style.left = playerX + "px";
+      tree.style.top = playerY + "px";
+      gameContainer.appendChild(tree);
+      trees++;
+      treesEl.textContent = trees;
+    }
+
+    function nextLevel() {
+      level++;
+      time = 30 + (level - 1) * 10;
+      levelEl.textContent = "Nivel: " + level;
+      timeEl.textContent = "Tiempo: " + time;
+      limpiarNivel();
+      generateTrash(5 + level * 2);
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowUp") mover(0, -speed);
+      if (e.key === "ArrowDown") mover(0, speed);
+      if (e.key === "ArrowLeft") mover(-speed, 0);
+      if (e.key === "ArrowRight") mover(speed, 0);
+      if (e.key === " ") plantar();
+    });
+
+    plantarBtn.addEventListener("click", plantar);
+
+    // Joystick táctil
+    let centerX, centerY, active = false;
+    joystick.addEventListener("touchstart", e => {
+      const rect = joystick.getBoundingClientRect();
+      centerX = rect.left + rect.width / 2;
+      centerY = rect.top + rect.height / 2;
+      active = true;
+    });
+    joystick.addEventListener("touchend", () => {
+      joystickHandle.style.left = "30px";
+      joystickHandle.style.top = "30px";
+      active = false;
+    });
+    joystick.addEventListener("touchmove", e => {
+      if (!active) return;
+      const touch = e.touches[0];
+      let dx = touch.clientX - centerX;
+      let dy = touch.clientY - centerY;
+      joystickHandle.style.left = Math.min(Math.max(30 + dx/3, 0), 60) + "px";
+      joystickHandle.style.top = Math.min(Math.max(30 + dy/3, 0), 60) + "px";
+
+      if (Math.abs(dx) > 20 || Math.abs(dy) > 20) {
+        mover(dx > 20 ? speed : dx < -20 ? -speed : 0,
+              dy > 20 ? speed : dy < -20 ? -speed : 0);
+      }
+    });
+
+    // Tiempo
+    setInterval(() => {
+      time--;
+      timeEl.textContent = "Tiempo: " + time;
+      if (time <= 0) {
+        nextLevel();
+      }
+    }, 1000);
+
+    function salir() {
+      window.location.href = "../loby.html";
+    }
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardianes de la Ciudad</title>
+  <link rel="icon" href="../imagenes/auto.jpg" type="image/x-icon">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url("../imagenes/looby.jpg") no-repeat center center/cover; 
+      height: 100vh;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+    }
+
+    .lobby {
+      position: relative;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 20px;
+      z-index: 2;
+    }
+
+    .perfil {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(30, 30, 30, 0.8);
+      border-radius: 10px;
+      padding: 10px 15px;
+    }
+    .perfil p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .menu-izq {
+      position: absolute;
+      top: 120px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .menu-izq button {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(40,40,40,0.8);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    .menu-izq button:hover {
+      background: rgba(70,70,70,0.9);
+    }
+
+    .avatar-container {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    .avatar {
+      width: 200px;
+      margin: 0 auto 15px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .head {
+      width: 100px;
+      height: 100px;
+      background: #f1c27d;
+      border-radius: 50%;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .ear {
+      width: 20px;
+      height: 30px;
+      background: #f1c27d;
+      position: absolute;
+      top: 35px;
+      border-radius: 50%;
+    }
+    .ear.left { left: -20px; }
+    .ear.right { right: -20px; }
+
+    .hair {
+      width: 100px;
+      height: 40px;
+      background: brown;
+      border-radius: 50% 50% 0 0;
+      position: absolute;
+      top: -10px;
+      left: 0;
+    }
+
+    .eye {
+      width: 12px;
+      height: 12px;
+      background: #000;
+      border-radius: 50%;
+      position: absolute;
+      top: 40px;
+    }
+    .eye.left { left: 25px; }
+    .eye.right { right: 25px; }
+
+    .body {
+      width: 120px;
+      height: 150px;
+      margin: 10px auto 0;
+      position: relative;
+    }
+
+    .shirt {
+      width: 120px;
+      height: 100px;
+      background: lightblue;
+      border-radius: 10px;
+    }
+
+    .arms {
+      position: absolute;
+      top: 20px;
+      left: -30px;
+      right: -30px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .arm {
+      width: 30px;
+      height: 90px;
+      background: #f1c27d;
+      border-radius: 15px;
+      position: relative;
+    }
+
+    .hand {
+      width: 30px;
+      height: 30px;
+      background: #f1c27d;
+      border-radius: 50%;
+      position: absolute;
+      bottom: -15px;
+      left: 0;
+    }
+
+    .shorts {
+      width: 120px;
+      height: 50px;
+      background: navy;
+      margin-top: -10px;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .legs {
+      display: flex;
+      justify-content: space-between;
+      width: 120px;
+      margin: 0 auto;
+    }
+
+    .leg {
+      width: 40px;
+      height: 70px;
+      background: #f1c27d;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .sandal {
+      width: 40px;
+      height: 15px;
+      background: black;
+      position: absolute;
+      bottom: 0;
+      border-radius: 5px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .btn-entrar {
+      margin-top: 10px;
+      padding: 15px 40px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #28a745, #4caf50);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0px 0px 12px black;
+      transition: transform 0.3s;
+    }
+    .btn-entrar:hover {
+      transform: scale(1.1);
+    }
+
+    .menu-der {
+      position: absolute;
+      top: 120px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .menu-der button {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(40,40,40,0.8);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    .menu-der button:hover {
+      background: rgba(70,70,70,0.9);
+    }
+
+    /* Botón música */
+    #btnMusica {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(40,40,40,0.8);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    #btnMusica:hover {
+      background: rgba(70,70,70,0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <!-- Perfil -->
+  <div class="perfil">
+    <p><strong>Usuario:</strong> Juan</p>
+    <p><strong>Nivel:</strong> 5</p>
+    <p><strong>Rango:</strong> Guardián Verde 🌳</p>
+  </div>
+
+  <!-- Menú izquierdo -->
+  <div class="menu-izq">
+    <button>📜 Misiones</button>
+    <button>🛒 Tienda</button>
+    <button>🎒 Inventario</button>
+    <button>👥 Amigos</button>
+  </div>
+
+  <!-- Centro: avatar y botón -->
+  <div class="avatar-container">
+    <div class="avatar">
+      <div class="head">
+        <div class="ear left"></div>
+        <div class="ear right"></div>
+        <div class="hair"></div>
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+      </div>
+      <div class="body">
+        <div class="shirt"></div>
+        <div class="arms">
+          <div class="arm left"><div class="hand"></div></div>
+          <div class="arm right"><div class="hand"></div></div>
+        </div>
+        <div class="shorts"></div>
+      </div>
+      <div class="legs">
+        <div class="leg left"><div class="sandal"></div></div>
+        <div class="leg right"><div class="sandal"></div></div>
+      </div>
+    </div>
+    <button class="btn-entrar" onclick="entrarJuego()">🚀 Entrar</button>
+  </div>
+
+  <!-- Menú derecho -->
+  <div class="menu-der">
+    <button>🏆 Ranking</button>
+    <button>🎁 Recompensas</button>
+    <button>⚙️ Configuración</button>
+    <button>❓ Ayuda</button>
+  </div>
+
+  <!-- Música -->
+  <audio id="musicaFondo" loop>
+    <source src="../musica/wwd.mp3juice.blog - SOUNDTRACK NAVIDEÑO 2018 - FREE FIRE (320 KBps).mp3" type="audio/mpeg">
+    Tu navegador no soporta audio HTML5.
+  </audio>
+  <button id="btnMusica">🔊 Activar Música</button>
+
+  <script>
+    function entrarJuego() {
+      window.location.href = "../juego/juego.html";
+    }
+
+    const musica = document.getElementById("musicaFondo");
+    const btnMusica = document.getElementById("btnMusica");
+    let sonando = false;
+
+    btnMusica.addEventListener("click", () => {
+      if (!sonando) {
+        musica.play();
+        btnMusica.textContent = "🔈 Pausar Música";
+        sonando = true;
+      } else {
+        musica.pause();
+        btnMusica.textContent = "🔊 Activar Música";
+        sonando = false;
+      }
+    });
+  </script>
+</body>
+</html>
